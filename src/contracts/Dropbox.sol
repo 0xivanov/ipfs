@@ -27,7 +27,7 @@ contract Dropbox {
     // Make sure the file hash exists
     require(bytes(_fileHash).length > 0);
     // Make sure uploader address exists
-    require(msg.sender!=address(0));
+    //require(msg.sender!=address(0));
     // Make sure file size is more than 0
     require(_fileSize>0);
 

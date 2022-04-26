@@ -6,10 +6,10 @@ import { create } from "ipfs-http-client";
 
 function App() {
 
-  const [account, setAccount] = useState(undefined)
-  const [provider, setProvider] = useState(undefined)
-  const [file, setFile] = useState(undefined)
-  const [dropbox, setDropbox] = useState(undefined)
+  const [account, setAccount] = useState()
+  const [provider, setProvider] = useState()
+  const [file, setFile] = useState()
+  const [dropboxx, setDropbox] = useState()
 
   useEffect(() => {
     const accountChangeListener = () => {
@@ -25,15 +25,14 @@ function App() {
   const connectAccount = async () => {
     if(window.ethereum) {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
-      setProvider(provider)
       provider.send("eth_requestAccounts").then((accounts) => {
-        console.log(accounts)
         setAccount(accounts[0])
       })
       .catch((error) => {
         alert("metamask connection rejected")
         console.log(error)
       })
+      setProvider(provider)
     } else {
       alert("install metamask")
     }
@@ -55,7 +54,7 @@ function App() {
 	};
 
 	const handleSubmission = async () => {
-    const ipfs = create({ host: 'localhost', port: '5001', protocol: 'http'})
+    const ipfs = create({ host: 'localhost', port: '5002', protocol: 'http'})
 
     console.log("Submitting file to IPFS...")
     console.log(file)
@@ -70,9 +69,10 @@ function App() {
       const fileType = file.type
       await loadContract().then(
         () => {
-          dropbox.functions.uploadFile(fileName, result.size, result.cid).send((result) => {
+          console.log()
+          dropboxx.functions.uploadFile(fileName, result.size, result.cid.toString()).then((result) => {
             console.log(result)
-          })
+          }).catch((error) => { console.log(error) })
         }
       )
       //console.log(dropbox)
@@ -88,9 +88,10 @@ function App() {
 
     if(networkData) {
       // Assign contract
-      const dropbox = new ethers.Contract(networkData.address, Dropbox.abi, provider)
-      setDropbox(dropbox)
-      console.log(dropbox)
+      console.log(provider)
+      const signer = provider.getSigner()
+      console.log(signer)
+      setDropbox(new ethers.Contract(networkData.address, Dropbox.abi, signer))
     } else {
       window.alert('DStorage contract not deployed to detected network.')
     }
@@ -98,7 +99,7 @@ function App() {
 
   return (
     <>
-      <button disabled={account} onClick={
+      <button disabled={false} onClick={
         () => {
           connectAccount()
         }
